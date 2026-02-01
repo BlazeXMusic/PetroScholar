@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Petroleum Engineering Notes{% endblock %}
+
+{% block content %}
+<div class="hero-section" style="text-align: center; padding: 3rem 0; margin-bottom: 3rem;">
+    <h1 style="font-size: 2.5rem; margin-bottom: 1rem;">Petroleum Engineering Notes</h1>
+    <p style="font-size: 1.2rem; color: var(--text-secondary); max-width: 800px; margin: 0 auto 2rem;">
+        Comprehensive collection of study materials, lecture notes, and resources for petroleum engineering students and professionals.
+    </p>
+    <a href="{{ url_for('notes') }}" class="btn" style="padding: 1rem 2rem; font-size: 1.1rem;">
+        <i class="fas fa-search"></i> Browse All Notes
+    </a>
+</div>
+
+<div class="stats-section" style="margin-bottom: 3rem;">
+    <div class="grid grid-3">
+        <div class="card" style="text-align: center;">
+            <i class="fas fa-book" style="font-size: 2.5rem; color: var(--accent); margin-bottom: 1rem;"></i>
+            <h3 style="font-size: 2rem; margin-bottom: 0.5rem;">{{ total_notes }}</h3>
+            <p style="color: var(--text-secondary);">Total Notes</p>
+        </div>
+        <div class="card" style="text-align: center;">
+            <i class="fas fa-graduation-cap" style="font-size: 2.5rem; color: var(--accent); margin-bottom: 1rem;"></i>
+            <h3 style="font-size: 2rem; margin-bottom: 0.5rem;">{{ total_subjects }}</h3>
+            <p style="color: var(--text-secondary);">Subjects</p>
+        </div>
+        <div class="card" style="text-align: center;">
+            <i class="fas fa-download" style="font-size: 2.5rem; color: var(--accent); margin-bottom: 1rem;"></i>
+            <h3 style="font-size: 2rem; margin-bottom: 0.5rem;">24/7</h3>
+            <p style="color: var(--text-secondary);">Available</p>
+        </div>
+    </div>
+</div>
+
+<div class="subjects-section" style="margin-bottom: 3rem;">
+    <h2 style="margin-bottom: 1.5rem; font-size: 1.8rem;">Browse by Subject</h2>
+    <div class="grid grid-4">
+        {% for subject in subjects[:8] %}
+        <a href="{{ url_for('notes') }}?subject_id={{ subject.id }}" class="card" style="text-decoration: none; display: block;">
+            <div style="text-align: center;">
+                <i class="fas fa-folder" style="font-size: 2rem; color: var(--accent); margin-bottom: 1rem;"></i>
+                <h3 style="margin-bottom: 0.5rem; color: var(--text-primary);">{{ subject.name }}</h3>
+                <p style="font-size: 0.9rem; color: var(--text-secondary);">
+                    {{ subject.notes|length }} notes available
+                </p>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+    
+    {% if subjects|length > 8 %}
+    <div style="text-align: center; margin-top: 2rem;">
+        <a href="{{ url_for('notes') }}" class="btn btn-secondary">
+            View All {{ subjects|length }} Subjects
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<div class="recent-notes-section">
+    <h2 style="margin-bottom: 1.5rem; font-size: 1.8rem;">Recently Added Notes</h2>
+    
+    {% if recent_notes %}
+    <div class="grid grid-3">
+        {% for note in recent_notes %}
+        <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+                <h3 style="margin-bottom: 0.5rem;">{{ note.title }}</h3>
+                <span style="background-color: var(--bg-secondary); padding: 0.2rem 0.5rem; border-radius: 3px; font-size: 0.8rem;">
+                    {{ note.subject.name }}
+                </span>
+            </div>
+            
+            {% if note.description %}
+            <p style="margin-bottom: 1rem; font-size: 0.9rem; color: var(--text-secondary);">
+                {{ note.description[:100] }}{% if note.description|length > 100 %}...{% endif %}
+            </p>
+            {% endif %}
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;">
+                <span style="font-size: 0.8rem; color: var(--text-secondary);">
+                    <i class="fas fa-calendar"></i> {{ note.upload_date.strftime('%b %d, %Y') }}
+                </span>
+                <span style="font-size: 0.8rem; color: var(--text-secondary);">
+                    <i class="fas fa-download"></i> {{ note.downloads }}
+                </span>
+            </div>
+            
+            <a href="{{ url_for('download_note', note_id=note.id) }}" class="btn" style="width: 100%; margin-top: 1rem;">
+                <i class="fas fa-download"></i> Download ({{ note.formatted_size }})
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="card" style="text-align: center; padding: 3rem;">
+        <i class="fas fa-book-open" style="font-size: 3rem; color: var(--text-secondary); margin-bottom: 1rem;"></i>
+        <h3>No Notes Available Yet</h3>
+        <p style="color: var(--text-secondary); margin-bottom: 1rem;">
+            Check back soon for study materials!
+        </p>
+        {% if current_user.is_authenticated %}
+        <a href="{{ url_for('upload_notes') }}" class="btn">
+            <i class="fas fa-upload"></i> Upload First Notes
+        </a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Panel - Petroleum Engineering Notes{% endblock %}
+
+{% block content %}
+<h1 style="margin-bottom: 1.5rem; font-size: 2rem;">Admin Dashboard</h1>
+<p style="color: var(--text-secondary); margin-bottom: 2rem;">
+    Welcome back, {{ current_user.username }}! Manage your petroleum engineering notes from here.
+</p>
+
+<!-- Stats Overview -->
+<div class="grid grid-4" style="margin-bottom: 3rem;">
+    <div class="card" style="text-align: center;">
+        <i class="fas fa-book" style="font-size: 2.5rem; color: var(--accent); margin-bottom: 1rem;"></i>
+        <h3 style="font-size: 2rem; margin-bottom: 0.5rem;">{{ total_notes }}</h3>
+        <p>Total Notes</p>
+    </div>
+    
+    <div class="card" style="text-align: center;">
+        <i class="fas fa-folder" style="font-size: 2.5rem; color: var(--accent); margin-bottom: 1rem;"></i>
+        <h3 style="font-size: 2rem; margin-bottom: 0.5rem;">{{ total_subjects }}</h3>
+        <p>Subjects</p>
+    </div>
+    
+    <div class="card" style="text-align: center;">
+        <i class="fas fa-download" style="font-size: 2.5rem; color: var(--accent); margin-bottom: 1rem;"></i>
+        <h3 style="font-size: 2rem; margin-bottom: 0.5rem;">{{ total_downloads }}</h3>
+        <p>Downloads</p>
+    </div>
+    
+    <div class="card" style="text-align: center;">
+        <i class="fas fa-hdd" style="font-size: 2.5rem; color: var(--accent); margin-bottom: 1rem;"></i>
+        <h3 style="font-size: 2rem; margin-bottom: 0.5rem;">Admin</h3>
+        <p>Account</p>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div style="margin-bottom: 3rem;">
+    <h2 style="margin-bottom: 1.5rem; font-size: 1.5rem;">Quick Actions</h2>
+    <div class="grid grid-4">
+        <a href="{{ url_for('upload_notes') }}" class="card" style="text-decoration: none; text-align: center;">
+            <i class="fas fa-upload" style="font-size: 2.5rem; color: var(--accent); margin-bottom: 1rem;"></i>
+            <h3>Upload Notes</h3>
+            <p style="font-size: 0.9rem; color: var(--text-secondary);">Add new study materials</p>
+        </a>
+        
+        <a href="{{ url_for('manage_notes') }}" class="card" style="text-decoration: none; text-align: center;">
+            <i class="fas fa-edit" style="font-size: 2.5rem; color: var(--accent); margin-bottom: 1rem;"></i>
+            <h3>Manage Notes</h3>
+            <p style="font-size: 0.9rem; color: var(--text-secondary);">View, edit or delete notes</p>
+        </a>
+        
+        <a href="{{ url_for('manage_subjects') }}" class="card" style="text-decoration: none; text-align: center;">
+            <i class="fas fa-folder-plus" style="font-size: 2.5rem; color: var(--accent); margin-bottom: 1rem;"></i>
+            <h3>Manage Subjects</h3>
+            <p style="font-size: 0.9rem; color: var(--text-secondary);">Add or remove subjects</p>
+        </a>
+        
+        <a href="{{ url_for('admin_logout') }}" class="card" style="text-decoration: none; text-align: center;">
+            <i class="fas fa-sign-out-alt" style="font-size: 2.5rem; color: #ef4444; margin-bottom: 1rem;"></i>
+            <h3>Logout</h3>
+            <p style="font-size: 0.9rem; color: var(--text-secondary);">Sign out from admin panel</p>
+        </a>
+    </div>
+</div>
+
+<!-- Recent Uploads -->
+<div style="margin-bottom: 3rem;">
+    <h2 style="margin-bottom: 1.5rem; font-size: 1.5rem;">Recent Uploads</h2>
+    
+    {% if recent_uploads %}
+    <div class="card">
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="border-bottom: 1px solid var(--border);">
+                    <th style="text-align: left; padding: 1rem 0.5rem;">Title</th>
+                    <th style="text-align: left; padding: 1rem 0.5rem;">Subject</th>
+                    <th style="text-align: left; padding: 1rem 0.5rem;">Date</th>
+                    <th style="text-align: left; padding: 1rem 0.5rem;">Downloads</th>
+                    <th style="text-align: left; padding: 1rem 0.5rem;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for note in recent_uploads %}
+                <tr style="border-bottom: 1px solid var(--border);">
+                    <td style="padding: 1rem 0.5rem;">{{ note.title }}</td>
+                    <td style="padding: 1rem 0.5rem;">{{ note.subject.name }}</td>
+                    <td style="padding: 1rem 0.5rem;">{{ note.upload_date.strftime('%Y-%m-%d') }}</td>
+                    <td style="padding: 1rem 0.5rem;">{{ note.downloads }}</td>
+                    <td style="padding: 1rem 0.5rem;">
+                        <a href="{{ url_for('download_note', note_id=note.id) }}" class="btn" style="padding: 0.3rem 0.8rem; font-size: 0.9rem;">
+                            <i class="fas fa-eye"></i> View
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="card" style="text-align: center; padding: 2rem;">
+        <i class="fas fa-upload" style="font-size: 3rem; color: var(--text-secondary); margin-bottom: 1rem;"></i>
+        <h3>No Uploads Yet</h3>
+        <p style="color: var(--text-secondary); margin-bottom: 1rem;">
+            Start by uploading your first petroleum engineering notes!
+        </p>
+        <a href="{{ url_for('upload_notes') }}" class="btn">
+            <i class="fas fa-plus"></i> Upload First Notes
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<!-- File Upload Instructions -->
+<div class="card">
+    <h2 style="margin-bottom: 1rem;">Upload Guidelines</h2>
+    <ul style="margin-left: 1.5rem; margin-bottom: 1rem;">
+        <li style="margin-bottom: 0.5rem;">Maximum file size: 50MB</li>
+        <li style="margin-bottom: 0.5rem;">Allowed formats: PDF, DOC, DOCX, TXT, PPT, PPTX, ZIP, RAR</li>
+        <li style="margin-bottom: 0.5rem;">Provide clear titles and descriptions</li>
+        <li style="margin-bottom: 0.5rem;">Select appropriate subject categories</li>
+        <li>Ensure you have rights to share the content</li>
+    </ul>
+</div>
+{% endblock %}

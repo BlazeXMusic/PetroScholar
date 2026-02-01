@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% block title %}Privacy Policy - Petroleum Engineering Notes{% endblock %}
+
+{% block content %}
+<div class="privacy-content">
+    <div class="card">
+        <h1 style="margin-bottom: 1.5rem; font-size: 2rem;">Privacy Policy</h1>
+        <p style="margin-bottom: 2rem; color: var(--text-secondary);">
+            Last Updated: {{ current_year }}
+        </p>
+        
+        <div style="margin-bottom: 2rem;">
+            <h2 style="margin-bottom: 1rem;">1. Information We Collect</h2>
+            <p style="margin-bottom: 1rem;">
+                PetroNotes is committed to protecting your privacy. We collect minimal information necessary to provide our services:
+            </p>
+            <ul style="margin-left: 1.5rem; margin-bottom: 1rem;">
+                <li style="margin-bottom: 0.5rem;">Admin login credentials (for administrators only)</li>
+                <li style="margin-bottom: 0.5rem;">Download statistics (anonymous)</li>
+                <li style="margin-bottom: 0.5rem;">Upload metadata (file names, descriptions, subjects)</li>
+                <li>Basic usage analytics</li>
+            </ul>
+        </div>
+        
+        <div style="margin-bottom: 2rem;">
+            <h2 style="margin-bottom: 1rem;">2. How We Use Your Information</h2>
+            <p style="margin-bottom: 1rem;">
+                The information we collect is used exclusively for:
+            </p>
+            <ul style="margin-left: 1.5rem; margin-bottom: 1rem;">
+                <li style="margin-bottom: 0.5rem;">Providing access to educational materials</li>
+                <li style="margin-bottom: 0.5rem;">Website administration and maintenance</li>
+                <li style="margin-bottom: 0.5rem;">Improving user experience</li>
+                <li>Generating usage statistics</li>
+            </ul>
+        </div>
+        
+        <div style="margin-bottom: 2rem;">
+            <h2 style="margin-bottom: 1rem;">3. File Uploads and Downloads</h2>
+            <p style="margin-bottom: 1rem;">
+                All uploaded notes are stored securely and are accessible to all users. We do not:
+            </p>
+            <ul style="margin-left: 1.5rem; margin-bottom: 1rem;">
+                <li style="margin-bottom: 0.5rem;">Modify the content of uploaded files</li>
+                <li style="margin-bottom: 0.5rem;">Claim ownership of uploaded materials</li>
+                <li style="margin-bottom: 0.5rem;">Sell or distribute uploaded files commercially</li>
+                <li>Store personal information in uploaded files</li>
+            </ul>
+        </div>
+        
+        <div style="margin-bottom: 2rem;">
+            <h2 style="margin-bottom: 1rem;">4. Data Security</h2>
+            <p style="margin-bottom: 1rem;">
+                We implement appropriate security measures to protect against unauthorized access, alteration, disclosure, or destruction of your personal information and data stored on our site.
+            </p>
+        </div>
+        
+        <div style="margin-bottom: 2rem;">
+            <h2 style="margin-bottom: 1rem;">5. Third-Party Services</h2>
+            <p style="margin-bottom: 1rem;">
+                PetroNotes does not use third-party analytics, advertising, or tracking services. All data is handled exclusively by our own systems.
+            </p>
+        </div>
+        
+        <div style="margin-bottom: 2rem;">
+            <h2 style="margin-bottom: 1rem;">6. Cookies</h2>
+            <p style="margin-bottom: 1rem;">
+                We use minimal cookies only for:
+            </p>
+            <ul style="margin-left: 1.5rem; margin-bottom: 1rem;">
+                <li style="margin-bottom: 0.5rem;">Admin session management</li>
+                <li style="margin-bottom: 0.5rem;">Basic site functionality</li>
+                <li>User preference storage</li>
+            </ul>
+        </div>
+        
+        <div style="margin-bottom: 2rem;">
+            <h2 style="margin-bottom: 1rem;">7. User Responsibilities</h2>
+            <p style="margin-bottom: 1rem;">
+                Users are responsible for:
+            </p>
+            <ul style="margin-left: 1.5rem; margin-bottom: 1rem;">
+                <li style="margin-bottom: 0.5rem;">Ensuring they have the right to upload materials</li>
+                <li style="margin-bottom: 0.5rem;">Not uploading copyrighted materials without permission</li>
+                <li style="margin-bottom: 0.5rem;">Keeping admin credentials secure</li>
+                <li>Using materials for educational purposes only</li>
+            </ul>
+        </div>
+        
+        <div style="margin-bottom: 2rem;">
+            <h2 style="margin-bottom: 1rem;">8. Changes to This Policy</h2>
+            <p style="margin-bottom: 1rem;">
+                We may update this privacy policy from time to time. We will notify users of any changes by posting the new policy on this page with an updated revision date.
+            </p>
+        </div>
+        
+        <div style="margin-bottom: 2rem;">
+            <h2 style="margin-bottom: 1rem;">9. Contact Us</h2>
+            <p style="margin-bottom: 1rem;">
+                If you have any questions about this Privacy Policy, please contact us at:
+            </p>
+            <p style="padding: 1rem; background-color: var(--bg-secondary); border-radius: 5px;">
+                <strong>Email:</strong> privacy@petronotes.com<br>
+                <strong>Admin Contact:</strong> admin@petronotes.com
+            </p>
+        </div>
+        
+        <div style="background-color: var(--bg-tertiary); padding: 1.5rem; border-radius: 5px; margin-top: 2rem;">
+            <p style="margin-bottom: 0; font-style: italic;">
+                <i class="fas fa-info-circle"></i> Note: This is a sample privacy policy for educational purposes. For a production website, consult with legal professionals to ensure compliance with local regulations.
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

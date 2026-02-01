@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}Upload Notes - Admin Panel{% endblock %}
+
+{% block content %}
+<div style="max-width: 800px; margin: 0 auto;">
+    <div style="margin-bottom: 2rem;">
+        <h1 style="margin-bottom: 0.5rem; font-size: 2rem;">Upload New Notes</h1>
+        <p style="color: var(--text-secondary);">
+            Add new petroleum engineering study materials to the database
+        </p>
+    </div>
+    
+    <div class="card">
+        <form method="POST" action="{{ url_for('upload_notes') }}" enctype="multipart/form-data">
+            <div class="form-group">
+                <label class="form-label">Select Subject *</label>
+                <select name="subject_id" class="form-control" required>
+                    <option value="">-- Choose a Subject --</option>
+                    {% for subject in subjects %}
+                    <option value="{{ subject.id }}">{{ subject.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Notes Title *</label>
+                <input type="text" name="title" class="form-control" placeholder="e.g., Introduction to Reservoir Engineering" required>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Description</label>
+                <textarea name="description" class="form-control" placeholder="Brief description of the notes, topics covered, etc."></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Upload File *</label>
+                <input type="file" name="file" class="form-control" accept=".pdf,.doc,.docx,.txt,.ppt,.pptx,.zip,.rar" required>
+                <p style="font-size: 0.9rem; color: var(--text-secondary); margin-top: 0.5rem;">
+                    <i class="fas fa-info-circle"></i> Max file size: 50MB | Allowed formats: PDF, DOC, DOCX, TXT, PPT, PPTX, ZIP, RAR
+                </p>
+            </div>
+            
+            <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                <button type="submit" class="btn">
+                    <i class="fas fa-upload"></i> Upload Notes
+                </button>
+                <a href="{{ url_for('admin_panel') }}" class="btn btn-secondary">
+                    <i class="fas fa-times"></i> Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+    
+    <div class="card" style="margin-top: 2rem;">
+        <h3 style="margin-bottom: 1rem;"><i class="fas fa-lightbulb"></i> Upload Tips</h3>
+        <ul style="margin-left: 1.5rem;">
+            <li style="margin-bottom: 0.5rem;">Use descriptive titles that clearly indicate the content</li>
+            <li style="margin-bottom: 0.5rem;">Include chapter numbers or specific topics in descriptions</li>
+            <li style="margin-bottom: 0.5rem;">Compress multiple files into ZIP format for better organization</li>
+            <li style="margin-bottom: 0.5rem;">Ensure files are properly scanned for viruses before uploading</li>
+            <li>Check copyright permissions for shared materials</li>
+        </ul>
+    </div>
+</div>
+{% endblock %}

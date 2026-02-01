@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block title %}All Notes - Petroleum Engineering Notes{% endblock %}
+
+{% block content %}
+<h1 style="margin-bottom: 1.5rem; font-size: 2rem;">Browse All Notes</h1>
+
+<div class="search-section" style="margin-bottom: 2rem;">
+    <form method="GET" action="{{ url_for('notes') }}" class="search-box">
+        <i class="fas fa-search"></i>
+        <input type="text" name="search" placeholder="Search notes by title or description..." 
+               value="{{ search_query }}" style="padding-left: 3rem;">
+    </form>
+</div>
+
+<div style="display: flex; gap: 2rem;">
+    <!-- Subjects Sidebar -->
+    <div style="flex: 1; min-width: 250px;">
+        <div class="card" style="position: sticky; top: 100px;">
+            <h3 style="margin-bottom: 1rem;">Subjects</h3>
+            <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                <a href="{{ url_for('notes') }}" 
+                   style="padding: 0.7rem 1rem; text-decoration: none; color: var(--text-primary); 
+                          border-radius: 5px; {% if not selected_subject %}background-color: var(--bg-tertiary); font-weight: 600;{% endif %}">
+                    <i class="fas fa-list"></i> All Subjects
+                </a>
+                {% for subject in subjects %}
+                <a href="{{ url_for('notes') }}?subject_id={{ subject.id }}" 
+                   style="padding: 0.7rem 1rem; text-decoration: none; color: var(--text-primary); 
+                          border-radius: 5px; {% if selected_subject == subject.id %}background-color: var(--bg-tertiary); font-weight: 600;{% endif %}">
+                    <i class="fas fa-folder"></i> {{ subject.name }}
+                    <span style="float: right; color: var(--text-secondary); font-size: 0.9em;">
+                        {{ subject.notes|length }}
+                    </span>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Notes List -->
+    <div style="flex: 3;">
+        {% if notes %}
+        <div class="grid grid-2">
+            {% for note in notes %}
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+                    <h3 style="margin-bottom: 0.5rem;">{{ note.title }}</h3>
+                    <span style="background-color: var(--bg-secondary); padding: 0.2rem 0.5rem; border-radius: 3px; font-size: 0.8rem;">
+                        {{ note.subject.name }}
+                    </span>
+                </div>
+                
+                {% if note.description %}
+                <p style="margin-bottom: 1rem; font-size: 0.9rem; color: var(--text-secondary);">
+                    {{ note.description }}
+                </p>
+                {% endif %}
+                
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <span style="font-size: 0.8rem; color: var(--text-secondary);">
+                        <i class="fas fa-file"></i> {{ note.original_filename.split('.')[-1]|upper }}
+                    </span>
+                    <span style="font-size: 0.8rem; color: var(--text-secondary);">
+                        <i class="fas fa-hdd"></i> {{ note.formatted_size }}
+                    </span>
+                </div>
+                
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: auto;">
+                    <span style="font-size: 0.8rem; color: var(--text-secondary);">
+                        <i class="fas fa-calendar"></i> {{ note.upload_date.strftime('%b %d, %Y') }}
+                        <span style="margin-left: 1rem;">
+                            <i class="fas fa-download"></i> {{ note.downloads }} downloads
+                        </span>
+                    </span>
+                    <a href="{{ url_for('download_note', note_id=note.id) }}" class="btn">
+                        <i class="fas fa-download"></i> Download
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="card" style="text-align: center; padding: 3rem;">
+            <i class="fas fa-search" style="font-size: 3rem; color: var(--text-secondary); margin-bottom: 1rem;"></i>
+            <h3>No Notes Found</h3>
+            <p style="color: var(--text-secondary); margin-bottom: 1rem;">
+                {% if search_query %}
+                No notes found for "{{ search_query }}"
+                {% elif selected_subject %}
+                No notes available for this subject yet.
+                {% else %}
+                No notes available in the database.
+                {% endif %}
+            </p>
+            {% if current_user.is_authenticated %}
+            <a href="{{ url_for('upload_notes') }}" class="btn">
+                <i class="fas fa-upload"></i> Upload Notes
+            </a>
+            {% endif %}
+            <a href="{{ url_for('notes') }}" class="btn btn-secondary" style="margin-left: 1rem;">
+                <i class="fas fa-times"></i> Clear Filters
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

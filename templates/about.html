@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}About Us - Petroleum Engineering Notes{% endblock %}
+
+{% block content %}
+<div class="about-hero" style="text-align: center; padding: 2rem 0; margin-bottom: 3rem;">
+    <h1 style="font-size: 2.5rem; margin-bottom: 1rem;">About PetroNotes</h1>
+    <p style="font-size: 1.2rem; color: var(--text-secondary); max-width: 800px; margin: 0 auto;">
+        Your comprehensive resource for petroleum engineering education and professional development.
+    </p>
+</div>
+
+<div class="grid grid-3" style="margin-bottom: 3rem;">
+    <div class="card" style="text-align: center;">
+        <i class="fas fa-graduation-cap" style="font-size: 3rem; color: var(--accent); margin-bottom: 1rem;"></i>
+        <h3 style="margin-bottom: 1rem;">For Students</h3>
+        <p>Comprehensive study materials, lecture notes, and exam preparation resources.</p>
+    </div>
+    
+    <div class="card" style="text-align: center;">
+        <i class="fas fa-user-tie" style="font-size: 3rem; color: var(--accent); margin-bottom: 1rem;"></i>
+        <h3 style="margin-bottom: 1rem;">For Professionals</h3>
+        <p>Latest industry knowledge, technical references, and professional development materials.</p>
+    </div>
+    
+    <div class="card" style="text-align: center;">
+        <i class="fas fa-globe" style="font-size: 3rem; color: var(--accent); margin-bottom: 1rem;"></i>
+        <h3 style="margin-bottom: 1rem;">Global Access</h3>
+        <p>Free access to quality educational resources for petroleum engineers worldwide.</p>
+    </div>
+</div>
+
+<div class="about-content" style="margin-bottom: 3rem;">
+    <div class="card">
+        <h2 style="margin-bottom: 1.5rem;">Our Mission</h2>
+        <p style="margin-bottom: 1rem;">
+            PetroNotes was established with a clear mission: to democratize access to quality petroleum engineering education. We believe that knowledge should be freely available to every aspiring petroleum engineer, regardless of their geographical location or financial background.
+        </p>
+        
+        <h3 style="margin-bottom: 1rem; margin-top: 2rem;">What We Offer</h3>
+        <ul style="margin-left: 1.5rem; margin-bottom: 1rem;">
+            <li style="margin-bottom: 0.5rem;">Comprehensive lecture notes from top petroleum engineering programs</li>
+            <li style="margin-bottom: 0.5rem;">Technical papers and research materials</li>
+            <li style="margin-bottom: 0.5rem;">Industry standards and best practices</li>
+            <li style="margin-bottom: 0.5rem;">Exam preparation materials</li>
+            <li>Software tutorials and technical guides</li>
+        </ul>
+    </div>
+</div>
+
+<div class="stats-section">
+    <h2 style="margin-bottom: 1.5rem;">By The Numbers</h2>
+    <div class="grid grid-4">
+        <div class="card" style="text-align: center;">
+            <h3 style="font-size: 2rem; color: var(--accent); margin-bottom: 0.5rem;">{{ total_notes }}</h3>
+            <p>Notes Available</p>
+        </div>
+        
+        <div class="card" style="text-align: center;">
+            <h3 style="font-size: 2rem; color: var(--accent); margin-bottom: 0.5rem;">{{ total_subjects }}</h3>
+            <p>Subjects Covered</p>
+        </div>
+        
+        <div class="card" style="text-align: center;">
+            <h3 style="font-size: 2rem; color: var(--accent); margin-bottom: 0.5rem;">{{ total_downloads }}</h3>
+            <p>Total Downloads</p>
+        </div>
+        
+        <div class="card" style="text-align: center;">
+            <h3 style="font-size: 2rem; color: var(--accent); margin-bottom: 0.5rem;">24/7</h3>
+            <p>Accessibility</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
