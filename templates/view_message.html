@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+
+{% block title %}View Message - Admin Panel{% endblock %}
+
+{% block content %}
+<div style="max-width: 800px; margin: 0 auto;">
+    <div style="margin-bottom: 2rem;">
+        <a href="{{ url_for('contact_messages') }}" class="btn btn-secondary" style="margin-bottom: 1rem;">
+            <i class="fas fa-arrow-left"></i> Back to Messages
+        </a>
+        
+        <div class="card">
+            <!-- Message Header -->
+            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border);">
+                <div>
+                    <h1 style="margin-bottom: 0.5rem; font-size: 1.8rem;">{{ message.subject }}</h1>
+                    <div style="display: flex; gap: 1rem; align-items: center;">
+                        <span style="background-color: {% if message.is_read %}var(--accent){% else %}#ef4444{% endif %}; 
+                                  color: white; padding: 0.2rem 0.8rem; border-radius: 3px; font-size: 0.8rem;">
+                            {% if message.is_read %}
+                            <i class="fas fa-check"></i> Read
+                            {% else %}
+                            <i class="fas fa-envelope"></i> New
+                            {% endif %}
+                        </span>
+                        <span style="color: var(--text-secondary); font-size: 0.9rem;">
+                            <i class="fas fa-clock"></i> {{ message.submitted_at.strftime('%B %d, %Y at %I:%M %p') }}
+                        </span>
+                    </div>
+                </div>
+                
+                <div style="display: flex; gap: 0.5rem;">
+                    {% if not message.is_read %}
+                    <a href="{{ url_for('mark_message_read', message_id=message.id) }}" 
+                       class="btn btn-secondary" style="padding: 0.3rem 0.8rem;">
+                        <i class="fas fa-check"></i> Mark Read
+                    </a>
+                    {% else %}
+                    <a href="{{ url_for('mark_message_unread', message_id=message.id) }}" 
+                       class="btn btn-secondary" style="padding: 0.3rem 0.8rem;">
+                        <i class="fas fa-envelope"></i> Mark Unread
+                    </a>
+                    {% endif %}
+                    
+                    <a href="{{ url_for('delete_message', message_id=message.id) }}" 
+                       class="btn btn-secondary" style="padding: 0.3rem 0.8rem; background-color: #fee2e2; color: #991b1b;"
+                       onclick="return confirm('Are you sure you want to delete this message?')">
+                        <i class="fas fa-trash"></i> Delete
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Sender Information -->
+            <div style="margin-bottom: 2rem; padding: 1.5rem; background-color: var(--bg-tertiary); border-radius: 5px;">
+                <h3 style="margin-bottom: 1rem; font-size: 1rem; color: var(--text-secondary);">
+                    <i class="fas fa-user"></i> Sender Information
+                </h3>
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;">
+                    <div>
+                        <p style="margin-bottom: 0.3rem; font-size: 0.9rem; color: var(--text-secondary);">Name</p>
+                        <p style="font-weight: 600;">{{ message.name }}</p>
+                    </div>
+                    <div>
+                        <p style="margin-bottom: 0.3rem; font-size: 0.9rem; color: var(--text-secondary);">Email</p>
+                        <p style="font-weight: 600;">
+                            <a href="mailto:{{ message.email }}" style="color: var(--accent); text-decoration: none;">
+                                {{ message.email }}
+                            </a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Message Content -->
+            <div style="margin-bottom: 2rem;">
+                <h3 style="margin-bottom: 1rem; font-size: 1rem; color: var(--text-secondary);">
+                    <i class="fas fa-comment"></i> Message
+                </h3>
+                <div style="padding: 1.5rem; background-color: var(--bg-secondary); border-radius: 5px; min-height: 200px; white-space: pre-wrap; line-height: 1.6;">
+                    {{ message.message }}
+                </div>
+            </div>
+            
+            <!-- Quick Actions -->
+            <div style="display: flex; gap: 1rem; margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border);">
+                <a href="mailto:{{ message.email }}?subject=Re: {{ message.subject }}" 
+                   class="btn" target="_blank">
+                    <i class="fas fa-reply"></i> Reply via Email
+                </a>
+                
+                <button class="btn btn-secondary" onclick="copyEmail()">
+                    <i class="fas fa-copy"></i> Copy Email Address
+                </button>
+                
+                <button class="btn btn-secondary" onclick="copyMessage()">
+                    <i class="fas fa-copy"></i> Copy Message
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Navigation between messages -->
+    <div class="card">
+        <div style="display: flex; justify-content: space-between;">
+            <a href="#" class="btn btn-secondary">
+                <i class="fas fa-chevron-left"></i> Previous Message
+            </a>
+            <a href="#" class="btn btn-secondary">
+                Next Message <i class="fas fa-chevron-right"></i>
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+function copyEmail() {
+    navigator.clipboard.writeText("{{ message.email }}")
+        .then(() => {
+            alert('Email address copied to clipboard!');
+        })
+        .catch(err => {
+            console.error('Failed to copy: ', err);
+            alert('Failed to copy email address');
+        });
+}
+
+function copyMessage() {
+    const messageText = `From: {{ message.name }} ({{ message.email }})\nSubject: {{ message.subject }}\nDate: {{ message.submitted_at.strftime('%B %d, %Y at %I:%M %p') }}\n\nMessage:\n{{ message.message }}`;
+    
+    navigator.clipboard.writeText(messageText)
+        .then(() => {
+            alert('Message copied to clipboard!');
+        })
+        .catch(err => {
+            console.error('Failed to copy: ', err);
+            alert('Failed to copy message');
+        });
+}
+</script>
+{% endblock %}
