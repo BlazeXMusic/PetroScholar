@@ -1,126 +1,421 @@
 {% extends "base.html" %}
 
-{% block title %}Admin Panel - Petroleum Engineering Notes{% endblock %}
+{% block title %}Admin Dashboard - PetroScholar{% endblock %}
 
 {% block content %}
-<h1 style="margin-bottom: 1.5rem; font-size: 2rem;">Admin Dashboard</h1>
-<p style="color: var(--text-secondary); margin-bottom: 2rem;">
-    Welcome back, {{ current_user.username }}! Manage your petroleum engineering notes from here.
-</p>
 
 <!-- Stats Overview -->
+<div class="section-header" style="margin-top: 2rem;">
+    <h2 class="section-title">
+        <i class="fas fa-chart-line"></i> Dashboard Overview
+    </h2>
+</div>
+
 <div class="grid grid-4" style="margin-bottom: 3rem;">
     <div class="card" style="text-align: center;">
         <i class="fas fa-book" style="font-size: 2.5rem; color: var(--accent); margin-bottom: 1rem;"></i>
-        <h3 style="font-size: 2rem; margin-bottom: 0.5rem;">{{ total_notes }}</h3>
-        <p>Total Notes</p>
+        <h3 style="font-size: 2.5rem; margin-bottom: 0.5rem; color: var(--text-primary);">{{ total_notes }}</h3>
+        <p style="color: var(--text-secondary); font-weight: 500;">Total Notes</p>
+        <div style="margin-top: 1rem;">
+            <a href="{{ url_for('manage_notes') }}" class="btn btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.9rem;">
+                <i class="fas fa-eye"></i> View All
+            </a>
+        </div>
     </div>
     
     <div class="card" style="text-align: center;">
         <i class="fas fa-folder" style="font-size: 2.5rem; color: var(--accent); margin-bottom: 1rem;"></i>
-        <h3 style="font-size: 2rem; margin-bottom: 0.5rem;">{{ total_subjects }}</h3>
-        <p>Subjects</p>
+        <h3 style="font-size: 2.5rem; margin-bottom: 0.5rem; color: var(--text-primary);">{{ total_subjects }}</h3>
+        <p style="color: var(--text-secondary); font-weight: 500;">Subjects</p>
+        <div style="margin-top: 1rem;">
+            <a href="{{ url_for('manage_subjects') }}" class="btn btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.9rem;">
+                <i class="fas fa-cog"></i> Manage
+            </a>
+        </div>
     </div>
     
     <div class="card" style="text-align: center;">
         <i class="fas fa-download" style="font-size: 2.5rem; color: var(--accent); margin-bottom: 1rem;"></i>
-        <h3 style="font-size: 2rem; margin-bottom: 0.5rem;">{{ total_downloads }}</h3>
-        <p>Downloads</p>
+        <h3 style="font-size: 2.5rem; margin-bottom: 0.5rem; color: var(--text-primary);">{{ total_downloads }}</h3>
+        <p style="color: var(--text-secondary); font-weight: 500;">Total Downloads</p>
+        <div style="margin-top: 1rem;">
+            <span class="badge badge-success" style="padding: 0.5rem 1rem;">
+                <i class="fas fa-chart-up"></i> Active
+            </span>
+        </div>
     </div>
     
     <div class="card" style="text-align: center;">
-        <i class="fas fa-hdd" style="font-size: 2.5rem; color: var(--accent); margin-bottom: 1rem;"></i>
-        <h3 style="font-size: 2rem; margin-bottom: 0.5rem;">Admin</h3>
-        <p>Account</p>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <i class="fas fa-user-shield" style="font-size: 2.5rem; color: var(--accent);"></i>
+            {% if unread_messages > 0 %}
+            <span class="badge badge-error" style="font-size: 0.7rem;">
+                {{ unread_messages }} new
+            </span>
+            {% endif %}
+        </div>
+        <h3 style="font-size: 1.8rem; margin-bottom: 0.5rem; color: var(--text-primary);">Admin Panel</h3>
+        <p style="color: var(--text-secondary); font-weight: 500;">Management Console</p>
+        <div style="margin-top: 1rem; display: flex; gap: 0.5rem; justify-content: center;">
+            <a href="{{ url_for('admin_logout') }}" class="btn btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.9rem;">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+        </div>
     </div>
 </div>
 
 <!-- Quick Actions -->
-<div style="margin-bottom: 3rem;">
-    <h2 style="margin-bottom: 1.5rem; font-size: 1.5rem;">Quick Actions</h2>
-    <div class="grid grid-4">
-        <a href="{{ url_for('upload_notes') }}" class="card" style="text-decoration: none; text-align: center;">
-            <i class="fas fa-upload" style="font-size: 2.5rem; color: var(--accent); margin-bottom: 1rem;"></i>
-            <h3>Upload Notes</h3>
-            <p style="font-size: 0.9rem; color: var(--text-secondary);">Add new study materials</p>
-        </a>
-        
-        <a href="{{ url_for('manage_notes') }}" class="card" style="text-decoration: none; text-align: center;">
-            <i class="fas fa-edit" style="font-size: 2.5rem; color: var(--accent); margin-bottom: 1rem;"></i>
-            <h3>Manage Notes</h3>
-            <p style="font-size: 0.9rem; color: var(--text-secondary);">View, edit or delete notes</p>
-        </a>
-        
-        <a href="{{ url_for('manage_subjects') }}" class="card" style="text-decoration: none; text-align: center;">
-            <i class="fas fa-folder-plus" style="font-size: 2.5rem; color: var(--accent); margin-bottom: 1rem;"></i>
-            <h3>Manage Subjects</h3>
-            <p style="font-size: 0.9rem; color: var(--text-secondary);">Add or remove subjects</p>
-        </a>
-        
-        <a href="{{ url_for('admin_logout') }}" class="card" style="text-decoration: none; text-align: center;">
-            <i class="fas fa-sign-out-alt" style="font-size: 2.5rem; color: #ef4444; margin-bottom: 1rem;"></i>
-            <h3>Logout</h3>
-            <p style="font-size: 0.9rem; color: var(--text-secondary);">Sign out from admin panel</p>
-        </a>
-    </div>
+<div class="section-header">
+    <h2 class="section-title">
+        <i class="fas fa-bolt"></i> Quick Actions
+    </h2>
 </div>
 
-<!-- Recent Uploads -->
-<div style="margin-bottom: 3rem;">
-    <h2 style="margin-bottom: 1.5rem; font-size: 1.5rem;">Recent Uploads</h2>
+<div class="grid grid-4" style="margin-bottom: 3rem;">
+    <a href="{{ url_for('upload_notes') }}" class="card" style="text-decoration: none; text-align: center; transition: all 0.3s;">
+        <div style="padding: 1rem;">
+            <div style="width: 70px; height: 70px; background: linear-gradient(135deg, var(--accent), var(--accent-light)); 
+                     border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
+                <i class="fas fa-upload" style="font-size: 1.8rem; color: white;"></i>
+            </div>
+            <h3 style="margin-bottom: 0.5rem; color: var(--text-primary);">Upload Notes</h3>
+            <p style="font-size: 0.9rem; color: var(--text-secondary); line-height: 1.4;">
+                Add new study materials, research papers, and lecture notes
+            </p>
+        </div>
+    </a>
     
-    {% if recent_uploads %}
+    <a href="{{ url_for('manage_notes') }}" class="card" style="text-decoration: none; text-align: center; transition: all 0.3s;">
+        <div style="padding: 1rem;">
+            <div style="width: 70px; height: 70px; background: linear-gradient(135deg, var(--accent), var(--accent-light)); 
+                     border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
+                <i class="fas fa-edit" style="font-size: 1.8rem; color: white;"></i>
+            </div>
+            <h3 style="margin-bottom: 0.5rem; color: var(--text-primary);">Manage Notes</h3>
+            <p style="font-size: 0.9rem; color: var(--text-secondary); line-height: 1.4;">
+                View, edit, organize or delete existing study materials
+            </p>
+        </div>
+    </a>
+    
+    <a href="{{ url_for('manage_subjects') }}" class="card" style="text-decoration: none; text-align: center; transition: all 0.3s;">
+        <div style="padding: 1rem;">
+            <div style="width: 70px; height: 70px; background: linear-gradient(135deg, var(--accent), var(--accent-light)); 
+                     border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
+                <i class="fas fa-folder-plus" style="font-size: 1.8rem; color: white;"></i>
+            </div>
+            <h3 style="margin-bottom: 0.5rem; color: var(--text-primary);">Manage Subjects</h3>
+            <p style="font-size: 0.9rem; color: var(--text-secondary); line-height: 1.4;">
+                Add, edit or remove subject categories for better organization
+            </p>
+        </div>
+    </a>
+    
+    <a href="{{ url_for('contact_messages') }}" class="card" style="text-decoration: none; text-align: center; transition: all 0.3s;">
+        <div style="padding: 1rem;">
+            <div style="width: 70px; height: 70px; background: linear-gradient(135deg, var(--accent), var(--accent-light)); 
+                     border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
+                <i class="fas fa-envelope" style="font-size: 1.8rem; color: white;"></i>
+                {% if unread_messages > 0 %}
+                <span style="position: absolute; top: -5px; right: -5px; background-color: var(--error); color: white; 
+                           border-radius: 50%; width: 25px; height: 25px; display: flex; align-items: center; 
+                           justify-content: center; font-size: 0.7rem; font-weight: bold;">
+                    {{ unread_messages }}
+                </span>
+                {% endif %}
+            </div>
+            <h3 style="margin-bottom: 0.5rem; color: var(--text-primary);">Contact Messages</h3>
+            <p style="font-size: 0.9rem; color: var(--text-secondary); line-height: 1.4;">
+                View and respond to user inquiries and feedback
+            </p>
+        </div>
+    </a>
+</div>
+
+<!-- Recent Activity Section -->
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 3rem;">
+    <!-- Recent Uploads -->
     <div class="card">
-        <table style="width: 100%; border-collapse: collapse;">
-            <thead>
-                <tr style="border-bottom: 1px solid var(--border);">
-                    <th style="text-align: left; padding: 1rem 0.5rem;">Title</th>
-                    <th style="text-align: left; padding: 1rem 0.5rem;">Subject</th>
-                    <th style="text-align: left; padding: 1rem 0.5rem;">Date</th>
-                    <th style="text-align: left; padding: 1rem 0.5rem;">Downloads</th>
-                    <th style="text-align: left; padding: 1rem 0.5rem;">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for note in recent_uploads %}
-                <tr style="border-bottom: 1px solid var(--border);">
-                    <td style="padding: 1rem 0.5rem;">{{ note.title }}</td>
-                    <td style="padding: 1rem 0.5rem;">{{ note.subject.name }}</td>
-                    <td style="padding: 1rem 0.5rem;">{{ note.upload_date.strftime('%Y-%m-%d') }}</td>
-                    <td style="padding: 1rem 0.5rem;">{{ note.downloads }}</td>
-                    <td style="padding: 1rem 0.5rem;">
-                        <a href="{{ url_for('download_note', note_id=note.id) }}" class="btn" style="padding: 0.3rem 0.8rem; font-size: 0.9rem;">
+        <div class="section-header" style="margin-bottom: 1.5rem; padding-bottom: 0.5rem;">
+            <h2 class="section-title" style="font-size: 1.3rem;">
+                <i class="fas fa-history"></i> Recent Uploads
+            </h2>
+            <a href="{{ url_for('manage_notes') }}" class="btn" style="padding: 0.3rem 0.8rem; font-size: 0.85rem;">
+                View All
+            </a>
+        </div>
+        
+        {% if recent_uploads %}
+        <div style="max-height: 300px; overflow-y: auto; padding-right: 0.5rem;">
+            {% for note in recent_uploads %}
+            <div style="padding: 1rem; border-bottom: 1px solid var(--border); {% if not loop.last %}margin-bottom: 0.5rem;{% endif %}">
+                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
+                    <div style="flex: 1;">
+                        <h4 style="margin-bottom: 0.3rem; font-size: 1rem; color: var(--text-primary);">
+                            {{ note.title }}
+                        </h4>
+                        <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.3rem;">
+                            <i class="fas fa-folder" style="margin-right: 0.3rem;"></i> {{ note.subject.name }}
+                        </p>
+                    </div>
+                    <span style="font-size: 0.8rem; color: var(--text-secondary); white-space: nowrap;">
+                        {{ note.upload_date.strftime('%b %d') }}
+                    </span>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-size: 0.8rem; color: var(--text-secondary);">
+                        <i class="fas fa-download"></i> {{ note.downloads }} downloads
+                    </span>
+                    <div style="display: flex; gap: 0.3rem;">
+                        <a href="{{ url_for('download_note', note_id=note.id) }}" 
+                           class="btn btn-secondary" style="padding: 0.2rem 0.6rem; font-size: 0.8rem;">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                        <a href="{{ url_for('delete_note', note_id=note.id) }}" 
+                           class="btn btn-danger" style="padding: 0.2rem 0.6rem; font-size: 0.8rem;"
+                           onclick="return confirm('Delete this note?')">
+                            <i class="fas fa-trash"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div style="text-align: center; padding: 2rem;">
+            <i class="fas fa-upload" style="font-size: 3rem; color: var(--text-secondary); margin-bottom: 1rem;"></i>
+            <h4 style="margin-bottom: 0.5rem; color: var(--text-secondary);">No Recent Uploads</h4>
+            <p style="color: var(--text-secondary); font-size: 0.9rem;">
+                Start by uploading your first petroleum engineering notes!
+            </p>
+            <a href="{{ url_for('upload_notes') }}" class="btn" style="margin-top: 1rem;">
+                <i class="fas fa-plus"></i> Upload Notes
+            </a>
+        </div>
+        {% endif %}
+    </div>
+    
+    <!-- Recent Messages -->
+    <div class="card">
+        <div class="section-header" style="margin-bottom: 1.5rem; padding-bottom: 0.5rem;">
+            <h2 class="section-title" style="font-size: 1.3rem;">
+                <i class="fas fa-comments"></i> Recent Messages
+            </h2>
+            <a href="{{ url_for('contact_messages') }}" class="btn" style="padding: 0.3rem 0.8rem; font-size: 0.85rem;">
+                View All
+            </a>
+        </div>
+        
+        {% if recent_messages %}
+        <div style="max-height: 300px; overflow-y: auto; padding-right: 0.5rem;">
+            {% for msg in recent_messages %}
+            <div style="padding: 1rem; border-bottom: 1px solid var(--border); 
+                       {% if not msg.is_read %}background-color: #fef2f2; border-left: 3px solid var(--error);{% endif %}
+                       {% if not loop.last %}margin-bottom: 0.5rem;{% endif %}">
+                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
+                    <div style="flex: 1;">
+                        <h4 style="margin-bottom: 0.3rem; font-size: 1rem; color: var(--text-primary);">
+                            {{ msg.subject }}
+                        </h4>
+                        <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.3rem;">
+                            <i class="fas fa-user" style="margin-right: 0.3rem;"></i> {{ msg.name }}
+                            <i class="fas fa-envelope" style="margin-left: 1rem; margin-right: 0.3rem;"></i> {{ msg.email }}
+                        </p>
+                    </div>
+                    {% if not msg.is_read %}
+                    <span class="badge badge-error" style="font-size: 0.7rem; padding: 0.2rem 0.5rem;">
+                        New
+                    </span>
+                    {% endif %}
+                </div>
+                <div style="margin-bottom: 0.5rem;">
+                    <p style="font-size: 0.9rem; color: var(--text-secondary); line-height: 1.4;">
+                        {{ msg.message|truncate(80) }}
+                    </p>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-size: 0.8rem; color: var(--text-secondary);">
+                        <i class="fas fa-clock"></i> {{ msg.submitted_at.strftime('%H:%M') }}
+                    </span>
+                    <div style="display: flex; gap: 0.3rem;">
+                        <a href="{{ url_for('view_message', message_id=msg.id) }}" 
+                           class="btn" style="padding: 0.2rem 0.6rem; font-size: 0.8rem;">
                             <i class="fas fa-eye"></i> View
                         </a>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                        {% if not msg.is_read %}
+                        <a href="{{ url_for('mark_message_read', message_id=msg.id) }}" 
+                           class="btn btn-success" style="padding: 0.2rem 0.6rem; font-size: 0.8rem;">
+                            <i class="fas fa-check"></i> Read
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div style="text-align: center; padding: 2rem;">
+            <i class="fas fa-envelope-open" style="font-size: 3rem; color: var(--text-secondary); margin-bottom: 1rem;"></i>
+            <h4 style="margin-bottom: 0.5rem; color: var(--text-secondary);">No Messages</h4>
+            <p style="color: var(--text-secondary); font-size: 0.9rem;">
+                No contact messages have been received yet.
+            </p>
+        </div>
+        {% endif %}
     </div>
-    {% else %}
-    <div class="card" style="text-align: center; padding: 2rem;">
-        <i class="fas fa-upload" style="font-size: 3rem; color: var(--text-secondary); margin-bottom: 1rem;"></i>
-        <h3>No Uploads Yet</h3>
-        <p style="color: var(--text-secondary); margin-bottom: 1rem;">
-            Start by uploading your first petroleum engineering notes!
-        </p>
-        <a href="{{ url_for('upload_notes') }}" class="btn">
-            <i class="fas fa-plus"></i> Upload First Notes
-        </a>
-    </div>
-    {% endif %}
 </div>
 
-<!-- File Upload Instructions -->
-<div class="card">
-    <h2 style="margin-bottom: 1rem;">Upload Guidelines</h2>
-    <ul style="margin-left: 1.5rem; margin-bottom: 1rem;">
-        <li style="margin-bottom: 0.5rem;">Maximum file size: 50MB</li>
-        <li style="margin-bottom: 0.5rem;">Allowed formats: PDF, DOC, DOCX, TXT, PPT, PPTX, ZIP, RAR</li>
-        <li style="margin-bottom: 0.5rem;">Provide clear titles and descriptions</li>
-        <li style="margin-bottom: 0.5rem;">Select appropriate subject categories</li>
-        <li>Ensure you have rights to share the content</li>
-    </ul>
+<!-- System Information -->
+<div class="section-header">
+    <h2 class="section-title">
+        <i class="fas fa-info-circle"></i> System Information
+    </h2>
 </div>
+
+<div class="grid grid-3" style="margin-bottom: 3rem;">
+    <div class="card">
+        <h3 style="margin-bottom: 1rem; color: var(--accent); display: flex; align-items: center; gap: 0.5rem;">
+            <i class="fas fa-server"></i> Storage Status
+        </h3>
+        <div style="margin-bottom: 1rem;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.3rem;">
+                <span style="font-size: 0.9rem; color: var(--text-secondary);">Uploads Directory</span>
+                <span style="font-size: 0.9rem; font-weight: 600; color: var(--accent);">Ready</span>
+            </div>
+            <div style="height: 8px; background-color: var(--bg-tertiary); border-radius: 4px; overflow: hidden;">
+                <div style="width: 75%; height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent-light));"></div>
+            </div>
+            <p style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.5rem;">
+                Maximum file size: 50MB per upload
+            </p>
+        </div>
+    </div>
+    
+    <div class="card">
+        <h3 style="margin-bottom: 1rem; color: var(--accent); display: flex; align-items: center; gap: 0.5rem;">
+            <i class="fas fa-database"></i> Database Status
+        </h3>
+        <div style="margin-bottom: 1rem;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                <span style="font-size: 0.9rem; color: var(--text-secondary);">Total Records</span>
+                <span style="font-size: 0.9rem; font-weight: 600; color: var(--accent);">{{ total_notes + total_subjects + total_messages }}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                <span style="font-size: 0.9rem; color: var(--text-secondary);">Database Size</span>
+                <span style="font-size: 0.9rem; font-weight: 600; color: var(--accent);">Optimized</span>
+            </div>
+            <p style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.5rem;">
+                SQLite database • Auto-backup enabled
+            </p>
+        </div>
+    </div>
+    
+    <div class="card">
+        <h3 style="margin-bottom: 1rem; color: var(--accent); display: flex; align-items: center; gap: 0.5rem;">
+            <i class="fas fa-shield-alt"></i> Security Status
+        </h3>
+        <div style="margin-bottom: 1rem;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                <span style="font-size: 0.9rem; color: var(--text-secondary);">Admin Session</span>
+                <span class="badge badge-success" style="font-size: 0.7rem;">Active</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                <span style="font-size: 0.9rem; color: var(--text-secondary);">Last Login</span>
+                <span style="font-size: 0.9rem; color: var(--text-secondary);">Active</span>
+            </div>
+            <p style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.5rem;">
+                <i class="fas fa-check-circle" style="color: var(--success);"></i>
+                System secured and operational
+            </p>
+        </div>
+        <a href="{{ url_for('admin_logout') }}" class="btn" style="width: 100%;">
+            <i class="fas fa-sign-out-alt"></i> Logout Session
+        </a>
+    </div>
+</div>
+
+<!-- Quick Tips -->
+<div class="card" style="background: linear-gradient(135deg, rgba(10, 110, 143, 0.05), rgba(13, 139, 181, 0.05)); 
+                        border: 2px dashed rgba(10, 110, 143, 0.3);">
+    <div style="display: flex; align-items: start; gap: 1rem;">
+        <div style="flex-shrink: 0;">
+            <i class="fas fa-lightbulb" style="font-size: 2rem; color: var(--accent);"></i>
+        </div>
+        <div>
+            <h3 style="margin-bottom: 1rem; color: var(--accent);">Quick Tips</h3>
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;">
+                <div>
+                    <p style="margin-bottom: 0.5rem; font-weight: 600; color: var(--text-primary);">
+                        <i class="fas fa-check-circle" style="color: var(--success); margin-right: 0.5rem;"></i>
+                        File Organization
+                    </p>
+                    <p style="font-size: 0.9rem; color: var(--text-secondary);">
+                        Use descriptive titles and organize notes by subject for better user experience.
+                    </p>
+                </div>
+                <div>
+                    <p style="margin-bottom: 0.5rem; font-weight: 600; color: var(--text-primary);">
+                        <i class="fas fa-check-circle" style="color: var(--success); margin-right: 0.5rem;"></i>
+                        Regular Updates
+                    </p>
+                    <p style="font-size: 0.9rem; color: var(--text-secondary);">
+                        Add new content regularly to keep the platform fresh and engaging for users.
+                    </p>
+                </div>
+                <div>
+                    <p style="margin-bottom: 0.5rem; font-weight: 600; color: var(--text-primary);">
+                        <i class="fas fa-check-circle" style="color: var(--success); margin-right: 0.5rem;"></i>
+                        Content Quality
+                    </p>
+                    <p style="font-size: 0.9rem; color: var(--text-secondary);">
+                        Ensure all uploaded materials are relevant, accurate, and properly formatted.
+                    </p>
+                </div>
+                <div>
+                    <p style="margin-bottom: 0.5rem; font-weight: 600; color: var(--text-primary);">
+                        <i class="fas fa-check-circle" style="color: var(--success); margin-right: 0.5rem;"></i>
+                        User Engagement
+                    </p>
+                    <p style="font-size: 0.9rem; color: var(--text-secondary);">
+                        Check contact messages regularly and respond to user inquiries promptly.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript for Dashboard Enhancements -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-refresh dashboard every 60 seconds
+    setInterval(() => {
+        // Only refresh if user is active
+        if (!document.hidden) {
+            location.reload();
+        }
+    }, 60000);
+    
+    // Add confirmation for destructive actions
+    const deleteButtons = document.querySelectorAll('.btn-danger');
+    deleteButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            if (!confirm('Are you sure you want to delete this item? This action cannot be undone.')) {
+                e.preventDefault();
+            }
+        });
+    });
+    
+    // Add tooltip functionality
+    const cards = document.querySelectorAll('.card[href]');
+    cards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-8px)';
+        });
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+        });
+    });
+});
+</script>
 {% endblock %}
