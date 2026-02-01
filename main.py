@@ -5,6 +5,7 @@ from flask_login import LoginManager, UserMixin, login_user, login_required, log
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from datetime import datetime
+import re
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -52,6 +53,15 @@ class Note(db.Model):
     downloads = db.Column(db.Integer, default=0)
     subject = db.relationship('Subject', backref=db.backref('notes', lazy=True))
 
+class ContactMessage(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    email = db.Column(db.String(100), nullable=False)
+    subject = db.Column(db.String(200), nullable=False)
+    message = db.Column(db.Text, nullable=False)
+    submitted_at = db.Column(db.DateTime, default=datetime.utcnow)
+    is_read = db.Column(db.Boolean, default=False)
+
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
@@ -67,23 +77,37 @@ def format_file_size(size_in_bytes):
         size_in_bytes /= 1024.0
     return f"{size_in_bytes:.1f} TB"
 
+def validate_email(email):
+    """Simple email validation"""
+    pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+    return re.match(pattern, email) is not None
+
 def init_database():
     """Initialize database with default data"""
     with app.app_context():
+        # Create all tables
         db.create_all()
         
-        # Create admin user if not exists
-        if not User.query.filter_by(username='petroscholar').first():
-            admin = User(
-                username='petroscholar',
-                password_hash=generate_password_hash('admin@123'),
-                is_admin=True
-            )
-            db.session.add(admin)
-            print("✓ Admin user created")
-            print("  Username: admin")
-            print("  Password: admin123")
-            print("  Please change these credentials after first login!")
+        # Check if admin user already exists
+        existing_admin = User.query.filter_by(username='admin').first()
+        if not existing_admin:
+            try:
+                admin = User(
+                    username='admin',
+                    password_hash=generate_password_hash('admin123'),
+                    is_admin=True
+                )
+                db.session.add(admin)
+                db.session.commit()
+                print("✓ Admin user created")
+                print("  Username: admin")
+                print("  Password: admin123")
+                print("  Please change these credentials after first login!")
+            except Exception as e:
+                print(f"Error creating admin user: {e}")
+                db.session.rollback()
+        else:
+            print("✓ Admin user already exists")
         
         # Create default subjects
         subjects_data = [
@@ -99,13 +123,26 @@ def init_database():
             ('Pipeline Engineering', 'Oil and gas transportation systems')
         ]
         
+        subjects_added = 0
         for name, desc in subjects_data:
-            if not Subject.query.filter_by(name=name).first():
-                subject = Subject(name=name, description=desc)
-                db.session.add(subject)
+            existing_subject = Subject.query.filter_by(name=name).first()
+            if not existing_subject:
+                try:
+                    subject = Subject(name=name, description=desc)
+                    db.session.add(subject)
+                    subjects_added += 1
+                except Exception as e:
+                    print(f"Error adding subject {name}: {e}")
+                    db.session.rollback()
         
-        db.session.commit()
-        print("✓ Database initialized successfully")
+        try:
+            db.session.commit()
+            if subjects_added > 0:
+                print(f"✓ Added {subjects_added} subjects")
+            print("✓ Database initialized successfully")
+        except Exception as e:
+            print(f"Error committing subjects: {e}")
+            db.session.rollback()
 
 # Routes
 @app.route('/')
@@ -186,6 +223,55 @@ def about():
 def privacy_policy():
     return render_template('privacy.html')
 
+@app.route('/contact', methods=['GET', 'POST'])
+def contact():
+    if request.method == 'POST':
+        name = request.form.get('name', '').strip()
+        email = request.form.get('email', '').strip()
+        subject = request.form.get('subject', '').strip()
+        message = request.form.get('message', '').strip()
+        
+        # Validate form data
+        if not name or not email or not subject or not message:
+            flash('All fields are required', 'error')
+            return redirect(url_for('contact'))
+        
+        if not validate_email(email):
+            flash('Please enter a valid email address', 'error')
+            return redirect(url_for('contact'))
+        
+        if len(name) < 2:
+            flash('Name must be at least 2 characters long', 'error')
+            return redirect(url_for('contact'))
+        
+        if len(message) < 10:
+            flash('Message must be at least 10 characters long', 'error')
+            return redirect(url_for('contact'))
+        
+        try:
+            # Save message to database
+            contact_msg = ContactMessage(
+                name=name,
+                email=email,
+                subject=subject,
+                message=message
+            )
+            db.session.add(contact_msg)
+            db.session.commit()
+            
+            # Show success message
+            flash('Message sent successfully! We will get back to you soon.', 'success')
+            
+            # Redirect to prevent form resubmission
+            return redirect(url_for('contact'))
+            
+        except Exception as e:
+            db.session.rollback()
+            flash('Error sending message. Please try again.', 'error')
+            return redirect(url_for('contact'))
+    
+    return render_template('contact.html')
+
 # Admin Routes
 @app.route('/admin/login', methods=['GET', 'POST'])
 def admin_login():
@@ -221,12 +307,24 @@ def admin_panel():
     total_subjects = Subject.query.count()
     recent_uploads = Note.query.order_by(Note.upload_date.desc()).limit(5).all()
     total_downloads = db.session.query(db.func.sum(Note.downloads)).scalar() or 0
+    unread_messages = ContactMessage.query.filter_by(is_read=False).count()
+    total_messages = ContactMessage.query.count()
+    
+    # Get recent messages for dashboard
+    recent_messages = ContactMessage.query.order_by(ContactMessage.submitted_at.desc()).limit(5).all()
+    
+    # Format file sizes
+    for note in recent_uploads:
+        note.formatted_size = format_file_size(note.file_size) if note.file_size else "Unknown"
     
     return render_template('admin_panel.html',
                          total_notes=total_notes,
                          total_subjects=total_subjects,
                          total_downloads=total_downloads,
-                         recent_uploads=recent_uploads)
+                         unread_messages=unread_messages,
+                         total_messages=total_messages,
+                         recent_uploads=recent_uploads,
+                         recent_messages=recent_messages)
 
 @app.route('/admin/upload', methods=['GET', 'POST'])
 @login_required
@@ -357,6 +455,121 @@ def delete_subject(subject_id):
     
     flash('Subject deleted successfully', 'success')
     return redirect(url_for('manage_subjects'))
+
+@app.route('/admin/change-credentials', methods=['GET', 'POST'])
+@login_required
+def change_credentials():
+    if request.method == 'POST':
+        current_password = request.form.get('current_password')
+        new_username = request.form.get('new_username')
+        new_password = request.form.get('new_password')
+        
+        # Verify current password
+        if not check_password_hash(current_user.password_hash, current_password):
+            flash('Current password is incorrect', 'error')
+            return redirect(url_for('change_credentials'))
+        
+        changes_made = False
+        
+        # Change username if provided
+        if new_username and new_username != current_user.username:
+            # Check if username already exists
+            existing_user = User.query.filter_by(username=new_username).first()
+            if existing_user and existing_user.id != current_user.id:
+                flash('Username already taken', 'error')
+                return redirect(url_for('change_credentials'))
+            
+            current_user.username = new_username
+            changes_made = True
+        
+        # Change password if provided
+        if new_password:
+            if len(new_password) < 8:
+                flash('Password must be at least 8 characters long', 'error')
+                return redirect(url_for('change_credentials'))
+            
+            current_user.password_hash = generate_password_hash(new_password)
+            changes_made = True
+        
+        if changes_made:
+            db.session.commit()
+            flash('Credentials updated successfully! Please login again.', 'success')
+            logout_user()
+            return redirect(url_for('admin_login'))
+        else:
+            flash('No changes were made', 'info')
+    
+    return render_template('change_credentials.html')
+
+@app.route('/admin/contact-messages')
+@login_required
+def contact_messages():
+    messages = ContactMessage.query.order_by(ContactMessage.submitted_at.desc()).all()
+    unread_count = ContactMessage.query.filter_by(is_read=False).count()
+    total_count = ContactMessage.query.count()
+    
+    return render_template('contact_messages.html', 
+                         messages=messages, 
+                         unread_count=unread_count,
+                         total_count=total_count)
+
+@app.route('/admin/view-message/<int:message_id>')
+@login_required
+def view_message(message_id):
+    message = ContactMessage.query.get_or_404(message_id)
+    
+    # Mark as read when viewing
+    if not message.is_read:
+        message.is_read = True
+        db.session.commit()
+    
+    return render_template('view_message.html', message=message)
+
+@app.route('/admin/mark-read/<int:message_id>')
+@login_required
+def mark_message_read(message_id):
+    message = ContactMessage.query.get_or_404(message_id)
+    if not message.is_read:
+        message.is_read = True
+        db.session.commit()
+        flash('Message marked as read', 'success')
+    return redirect(url_for('contact_messages'))
+
+@app.route('/admin/mark-unread/<int:message_id>')
+@login_required
+def mark_message_unread(message_id):
+    message = ContactMessage.query.get_or_404(message_id)
+    if message.is_read:
+        message.is_read = False
+        db.session.commit()
+        flash('Message marked as unread', 'success')
+    return redirect(url_for('contact_messages'))
+
+@app.route('/admin/delete-message/<int:message_id>')
+@login_required
+def delete_message(message_id):
+    message = ContactMessage.query.get_or_404(message_id)
+    db.session.delete(message)
+    db.session.commit()
+    flash('Message deleted successfully', 'success')
+    return redirect(url_for('contact_messages'))
+
+@app.route('/admin/export-messages')
+@login_required
+def export_messages():
+    messages = ContactMessage.query.order_by(ContactMessage.submitted_at.desc()).all()
+    
+    # Create CSV content
+    csv_content = "ID,Name,Email,Subject,Message,Submitted At,Status\n"
+    for msg in messages:
+        status = "Read" if msg.is_read else "Unread"
+        message_clean = msg.message.replace('"', '""').replace('\n', ' ').replace('\r', ' ')
+        csv_content += f'{msg.id},"{msg.name}","{msg.email}","{msg.subject}","{message_clean}","{msg.submitted_at}","{status}"\n'
+    
+    return csv_content, 200, {
+        'Content-Type': 'text/csv',
+        'Content-Disposition': 'attachment; filename=contact_messages.csv'
+    }
 
 # Error handlers
 @app.errorhandler(404)
