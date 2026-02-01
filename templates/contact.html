@@ -1,0 +1,191 @@
+{% extends "base.html" %}
+
+{% block title %}Contact Us - Petroleum Engineering Notes{% endblock %}
+
+{% block content %}
+<div class="contact-container" style="max-width: 1000px; margin: 0 auto; padding: 0 2rem;">
+    <div style="text-align: center; margin-bottom: 3rem;">
+        <h1 style="font-size: 2.8rem; margin-bottom: 1rem;">Contact Us</h1>
+        <p style="font-size: 1.3rem; color: var(--text-secondary);">
+            Have questions, suggestions, or need assistance? We're here to help!
+        </p>
+    </div>
+
+    <!-- Wide Contact Form -->
+    <div class="card" style="width: 100%; margin: 0 auto 3rem; padding: 2.5rem;">
+        <div style="text-align: center; margin-bottom: 2rem;">
+            <h2 style="font-size: 2.2rem; margin-bottom: 0.5rem; color: var(--accent);">
+                <i class="fas fa-paper-plane"></i> Send Us a Message
+            </h2>
+            <p style="color: var(--text-secondary);">
+                Fill out the form below and we'll get back to you as soon as possible
+            </p>
+        </div>
+        
+        <!-- Contact Form -->
+        <form method="POST" action="{{ url_for('contact') }}" id="contactForm" style="max-width: 800px; margin: 0 auto;">
+            <!-- Two Column Layout for Name and Email -->
+            <div class="grid grid-2" style="gap: 1.5rem; margin-bottom: 1.5rem;">
+                <div class="form-group">
+                    <label class="form-label">Your Name *</label>
+                    <input type="text" name="name" class="form-control" 
+                           placeholder="Enter your full name" required
+                           style="font-size: 1.1rem; padding: 0.8rem;"
+                           value="{{ request.form.name if request.form }}">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Email Address *</label>
+                    <input type="email" name="email" class="form-control" 
+                           placeholder="Enter your email" required
+                           style="font-size: 1.1rem; padding: 0.8rem;"
+                           value="{{ request.form.email if request.form }}">
+                </div>
+            </div>
+            
+            <!-- Full Width Subject -->
+            <div class="form-group" style="margin-bottom: 1.5rem;">
+                <label class="form-label">Subject *</label>
+                <input type="text" name="subject" class="form-control" 
+                       placeholder="What is this regarding?" required
+                       style="font-size: 1.1rem; padding: 0.8rem;"
+                       value="{{ request.form.subject if request.form }}">
+            </div>
+            
+            <!-- Full Width Message Box (Bigger) -->
+            <div class="form-group" style="margin-bottom: 2rem;">
+                <label class="form-label">Your Message *</label>
+                <textarea name="message" class="form-control" rows="8" 
+                          placeholder="Please provide details about your inquiry, suggestion, or issue..." 
+                          required
+                          style="font-size: 1.1rem; padding: 1rem; resize: vertical;">{{ request.form.message if request.form }}</textarea>
+            </div>
+            
+            <!-- Info Box -->
+            <div style="background-color: var(--bg-tertiary); padding: 1.2rem; border-radius: 8px; margin: 2rem 0; border-left: 4px solid var(--accent);">
+                <p style="margin-bottom: 0.3rem; font-size: 1rem; color: var(--text);">
+                    <i class="fas fa-info-circle" style="color: var(--accent);"></i> 
+                    <strong>Note:</strong> We typically respond within 24-48 hours
+                </p>
+                <p style="margin-bottom: 0; font-size: 0.95rem; color: var(--text-secondary);">
+                    By submitting this form, you agree to our Privacy Policy.
+                </p>
+            </div>
+            
+            <!-- Centered Buttons -->
+            <div style="display: flex; justify-content: center; gap: 1.5rem; margin-top: 2rem;">
+                <button type="submit" class="btn" id="submitBtn" 
+                        style="font-size: 1.1rem; padding: 0.8rem 2.5rem;">
+                    <i class="fas fa-paper-plane"></i> Send Message
+                </button>
+                <button type="reset" class="btn btn-secondary"
+                        style="font-size: 1.1rem; padding: 0.8rem 2.5rem;">
+                    <i class="fas fa-redo"></i> Clear Form
+                </button>
+            </div>
+        </form>
+        
+        <!-- Success Message -->
+        {% if request.method == 'POST' and not error %}
+        <div class="alert alert-success" style="margin-top: 2rem; font-size: 1.1rem; padding: 1.2rem;">
+            <i class="fas fa-check-circle"></i> 
+            <strong style="font-size: 1.2rem;">Message Sent Successfully!</strong>
+            <p style="margin-top: 0.8rem; margin-bottom: 0;">
+                Thank you for contacting us. We'll get back to you as soon as possible.
+            </p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- JavaScript for Form Handling -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const contactForm = document.getElementById('contactForm');
+    const submitBtn = document.getElementById('submitBtn');
+    
+    if (contactForm) {
+        contactForm.addEventListener('submit', function(e) {
+            const name = this.querySelector('input[name="name"]').value.trim();
+            const email = this.querySelector('input[name="email"]').value.trim();
+            const subject = this.querySelector('input[name="subject"]').value.trim();
+            const message = this.querySelector('textarea[name="message"]').value.trim();
+            
+            // Basic validation
+            if (name.length < 2) {
+                e.preventDefault();
+                alert('Please enter a valid name (at least 2 characters).');
+                return false;
+            }
+            
+            // Email validation
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailPattern.test(email)) {
+                e.preventDefault();
+                alert('Please enter a valid email address.');
+                return false;
+            }
+            
+            if (message.length < 10) {
+                e.preventDefault();
+                alert('Please enter a message with at least 10 characters.');
+                return false;
+            }
+            
+            // Show loading state
+            if (submitBtn) {
+                const originalText = submitBtn.innerHTML;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+                submitBtn.disabled = true;
+                
+                // Re-enable button if form submission takes too long
+                setTimeout(() => {
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
+                }, 10000);
+            }
+            
+            return true;
+        });
+    }
+});
+</script>
+
+<style>
+.contact-container .card {
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.form-control {
+    width: 100%;
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+    transition: all 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(var(--accent-rgb, 0, 123, 255), 0.1);
+}
+
+.alert {
+    border-radius: 8px;
+}
+
+@media (max-width: 768px) {
+    .contact-container {
+        padding: 0 1rem;
+    }
+    
+    .grid.grid-2 {
+        grid-template-columns: 1fr !important;
+    }
+    
+    .card {
+        padding: 1.5rem !important;
+    }
+}
+</style>
+{% endblock %}
