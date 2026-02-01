@@ -89,12 +89,12 @@ def init_database():
         db.create_all()
         
         # Check if admin user already exists
-        existing_admin = User.query.filter_by(username='admin').first()
+        existing_admin = User.query.filter_by(username='petroscholar0@gmail.com').first()
         if not existing_admin:
             try:
                 admin = User(
-                    username='admin',
-                    password_hash=generate_password_hash('admin123'),
+                    username='petroscholar0@gmail.com',
+                    password_hash=generate_password_hash('petroscholar@notes'),
                     is_admin=True
                 )
                 db.session.add(admin)
@@ -584,3 +584,4 @@ def internal_error(error):
 if __name__ == '__main__':
     init_database()
     app.run(debug=True, host='0.0.0.0', port=5000)
+
